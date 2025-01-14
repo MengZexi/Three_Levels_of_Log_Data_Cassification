@@ -55,6 +55,103 @@
         return modal;
     }
 
+
+
+    /**
+     * 模拟选择下拉框中的选项
+     * @param {string} labelText - 目标行的标签文本内容（如 "图片信息提取"）
+     * @param {string} optionText - 下拉框中需要选择的选项文本内容（如 "文本识别"）
+     */
+    function simulateSelectOption(labelText, optionText) {
+        // 获取所有 class 为 'ant-row ant-form-item-row css-3v32pk' 的元素
+        let rows = document.querySelectorAll('.ant-row.ant-form-item-row.css-3v32pk');
+
+        let targetRow = null;
+
+        // 遍历每个元素，检查子元素是否满足条件
+        rows.forEach((row) => {
+            // 查找 row 中的 class 为 'ant-col ant-form-item-label css-3v32pk' 的元素
+            let labelCol = row.querySelector('.ant-col.ant-form-item-label.css-3v32pk');
+            if (labelCol) {
+                // 查找 labelCol 中的 label 元素，并检查其文本内容
+                let label = labelCol.querySelector('label');
+                if (label && label.textContent.trim() === labelText) {
+                    targetRow = row; // 找到符合条件的 row
+                }
+            }
+        });
+
+        // 如果找到目标 row，继续查找其下的文本框
+        if (targetRow) {
+            console.log('找到目标 row:', targetRow);
+
+            // 定位目标元素
+            // 假设 targetRow 是找到的目标 row 元素
+            let selector = targetRow.querySelector('.ant-select-selector');
+
+            if (selector) {
+                console.log('找到目标组件:', selector);
+
+                // 创建一个鼠标点击事件
+                let clickEvent = new MouseEvent('click', {
+                    bubbles: true,  // 允许事件冒泡
+                    cancelable: true,  // 允许事件被取消
+                    view: window  // 事件关联的视图
+                });
+
+                // 触发点击事件以显示下拉菜单
+                selector.dispatchEvent(clickEvent);
+
+                console.log('已模拟点击 ant-select-selector');
+
+
+                const observer = new MutationObserver(() => {
+                    const options = document.querySelectorAll('.ant-select-item');
+                    if (options.length > 0) {
+                        observer.disconnect();
+                        options.forEach(option => {
+                            if (option.textContent.trim() === '文本识别') {
+                                option.click();
+                            }
+                        });
+                    }
+                });
+                observer.observe(document.body, { childList: true, subtree: true });
+
+                // // 使用一个小的延迟等待下拉菜单加载
+                // setTimeout(() => {
+                //     // 查找所有显示 "文本识别" 的选项
+                //     let textOptions = Array.from(document.querySelectorAll('.ant-select-item'))
+                //         .filter(item => item.innerText.trim() === '文本识别'); // 根据选项文本匹配
+
+                //     if (textOptions.length > 0) {
+                //         console.log(`找到 ${textOptions.length} 个目标选项:`, textOptions);
+
+                //         // 遍历所有目标选项并模拟点击
+                //         textOptions.forEach((textOption, index) => {
+                //             // 模拟点击目标选项
+                //             let optionClickEvent = new MouseEvent('click', {
+                //                 bubbles: true,
+                //                 cancelable: true,
+                //                 view: window
+                //             });
+
+                //             textOption.dispatchEvent(optionClickEvent);
+                //             console.log(`已模拟点击第 ${index + 1} 个 "文本识别" 选项`);
+                //         });
+                //     } else {
+                //         console.error('未找到 "文本识别" 的选项');
+                //     }
+                // }, 500); // 延迟 500 毫秒以确保菜单完全加载
+
+            } else {
+                console.error('未找到目标组件');
+            }
+        } else {
+            console.error('未找到 label 为 "image_extraction" 的 row');
+        }
+    }
+
     // Function to populate images in the modal
     function populateImages(modal) {
         const root = document.querySelector('#root');
@@ -197,48 +294,30 @@
             button.style.padding = '5px 10px';
             button.style.cursor = 'pointer';
             button.onclick = () => {
-                // // 定位到下拉框的根容器
-                // // let dropdown = document.querySelector('.ant-select.ant-select-in-form-item');
+                simulateSelectOption('图片信息提取', '文本识别');
+   
                 
 
-                // // 模拟点击下拉框以展开选项列表
-                // dropdown.click();
-
-                // // 等待下拉框展开后定位到目标选项
-                // setTimeout(() => {
-                //     // 根据选项内容定位到对应的元素
-                //     let option = Array.from(document.querySelectorAll('.ant-select-item-option'))
-                //         .find(el => el.textContent.trim() === '人物属性识别');
-
-                //     // 模拟点击目标选项
-                //     if (option) {
-                //         option.click();
-                //         console.log('选中“人物属性识别”成功');
-                //     } else {
-                //         console.error('未找到目标选项');
+                // // 定位到按钮元素
+                // let buttons = document.querySelectorAll('.ant-btn.css-3v32pk.ant-btn-primary'); // 选择所有匹配的按钮
+                // let targetButton = null;
+                // buttons.forEach((button) => {
+                //     if (button.textContent.trim() === '提 交') { 
+                //         targetButton = button;
                 //     }
-                // }, 500); // 延时确保下拉框选项已加载
+                // });
 
-                // 定位到按钮元素
-                let buttons = document.querySelectorAll('.ant-btn.css-3v32pk.ant-btn-primary'); // 选择所有匹配的按钮
-                let targetButton = null;
-                buttons.forEach((button) => {
-                    if (button.textContent.trim() === '提 交') { 
-                        targetButton = button;
-                    }
-                });
-
-                if (targetButton) {
-                    let event = new MouseEvent('click', {
-                        bubbles: true,  
-                        cancelable: true,  
-                        view: window
-                    });
-                    targetButton.dispatchEvent(event); 
-                    console.log('按钮已点击');
-                } else {
-                    console.error('未找到名字为"提交"的按钮');
-                }
+                // if (targetButton) {
+                //     let event = new MouseEvent('click', {
+                //         bubbles: true,  
+                //         cancelable: true,  
+                //         view: window
+                //     });
+                //     targetButton.dispatchEvent(event); 
+                //     console.log('按钮已点击');
+                // } else {
+                //     console.error('未找到名字为"提交"的按钮');
+                // }
             };
             buttonGroupDiv.appendChild(button);
         }
