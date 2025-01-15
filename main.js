@@ -842,6 +842,26 @@
             event.preventDefault();
             // populateImages(modal);
             modal.style.display = 'none';
+            // 定位到按钮元素
+            let buttons = document.querySelectorAll('.ant-btn.css-3v32pk.ant-btn-primary'); // 选择所有匹配的按钮
+            let targetButton = null;
+            buttons.forEach((button) => {
+                if (button.textContent.trim() === '提 交') { 
+                    targetButton = button;
+                }
+            });
+
+            if (targetButton) {
+                let event = new MouseEvent('click', {
+                    bubbles: true,  
+                    cancelable: true,  
+                    view: window
+                });
+                targetButton.dispatchEvent(event); 
+                console.log('按钮已点击');
+            } else {
+                console.error('未找到名字为"提交"的按钮');
+            }
         }
     });
     // Log script initialization
